@@ -1,0 +1,50 @@
+#flasks {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.flask {
+  display: flex;
+  flex-direction: column;
+  transition: transform 500ms;
+  transform: rotate(0deg);
+
+  &.pouring {
+    transform: rotate(15deg);
+  }
+
+  .segment {
+    width: 50px;
+    height: 50px;
+    border: 1px solid gray;
+
+    &[data-color="red"] {
+      background-color: red;
+    }
+
+    &[data-color="blue"] {
+      background-color: blue;
+    }
+
+    &:first-child {
+      border-top-color: transparent;
+
+      &::before {
+        display: block;
+        margin-left: -10px;
+        content: "";
+        width: calc(100% + 20px);
+        height: 20px;
+        margin-top: -22px;
+        border-radius: 10px;
+        border: 1px solid gray;
+      }
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 50px;
+      border-bottom-right-radius: 50px;
+    }
+  }
+}
