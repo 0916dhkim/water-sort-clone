@@ -1,38 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8" />
     <title>Water Sort</title>
-    <meta name="charset" value="utf-8" />
     <link rel="stylesheet" type="text/css" href="./art.css" />
   </head>
   <body>
     <h1>Water Sort</h1>
-    <pre><output id="output"></output></pre>
+    <output id="status" aria-live="polite" class="visually-hidden"></output>
     <div id="flasks">
       <!-- TODO-->
     </div>
-    <form>
-      <fieldset>
-        <legend>To flask</legend>
-        <label>
-          Flask 1
-          <input type="radio" name="to" value="0" />
-        </label>
-        <label>
-          Flask 2
-          <input type="radio" name="to" value="1" />
-        </label>
-        <label>
-          Flask 3
-          <input type="radio" name="to" value="2" />
-        </label>
-      </fieldset>
-
-      <button type="submit" id="test-button">Pour</button>
-    </form>
-
-    <dialog id="game-over">
-      <h2>You won!!!<h2>
+    <dialog id="game-over" aria-label="You won!">
+      <h2>You won!!!</h2>
     </dialog>
 
     <script src="./index.js" type="module" async defer></script>
