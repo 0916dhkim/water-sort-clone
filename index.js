@@ -52,59 +52,14 @@ function isSameColor(from, color) {
   return from.at(-1) === color;
 }
 
-function print() {
-  //  outputEl.innerHTML = JSON.stringify(gameData, null, 2);
-}
-
 const outputEl = document.getElementById("output");
 const flasksEl = document.getElementById("flasks");
 
-print();
-
-document.querySelector("form")?.addEventListener("submit", (evt) => {
-  evt.preventDefault();
-  evt.stopPropagation();
-
-  const target = evt.target;
-  const formData = new FormData(/** @type {HTMLFormElement} */ (target));
-
-  const from = selectedFromFlask;
-  const to = Number.parseInt(/** @type {string} */ (formData.get("to")));
-
-  pour(gameData[from], gameData[to]);
-  setFlaskOpen(null);
-  print();
-  updateFlasks();
-});
-
-document.querySelector("form").addEventListener("input", (evt) => {
-  const target = /** @type {HTMLInputElement}*/ (evt.target);
-
-  if (target.matches('input[type="radio"]')) {
-    if (target.hasAttribute("aria-disabled")) {
-      evt.preventDefault();
-      evt.stopPropagation();
-    }
-
-    const inputSelector = `input[type="radio"][name="to"]`;
-
-    document
-      .querySelectorAll(inputSelector)
-      .forEach((/** @type {HTMLInputElement}*/ input) => {
-        input.toggleAttribute("aria-disabled", false);
-      });
-
-    /** @type {HTMLInputElement}*/ (
-      document.querySelector(`${inputSelector}[value="${target.value}"]`)
-    ).toggleAttribute("aria-disabled", true);
-  }
-});
-
 /**
- * @param {number} flaskIndex
- * @returns {HTMLDivElement}
+ * @param {HTMLDivElement} flaskDiv
+ * @param {Flask} flask
  */
-function renderFlask(flaskDiv, flask, flaskIndex) {
+function renderFlask(flaskDiv, flask) {
   flaskDiv.replaceChildren();
   for (let i = FLASK_SIZE - 1; i >= 0; i--) {
     const segment = document.createElement("div");
@@ -113,7 +68,6 @@ function renderFlask(flaskDiv, flask, flaskIndex) {
     flaskDiv.appendChild(segment);
   }
 
-  return flaskDiv;
 }
 
 function updateFlasks() {
@@ -124,6 +78,30 @@ function updateFlasks() {
 }
 
 /**
+ * Triggered when a flask is clicked
+ *
+ * @param {number} flaskIndex
+ */
+function selectFlask(flaskIndex) {
+
+  if (selectedFromFlask === null) {
+    // No flask is selected
+    setFlaskOpen(flaskIndex);
+  } else if (selectedFromFlask === flaskIndex) {
+    // Close the flask
+    setFlaskOpen(null);
+  } else {
+    // A different flask is selected, attempt to pour!
+    pour(gameData[selectedFromFlask], gameData[flaskIndex]);
+    setFlaskOpen(null);
+    updateFlasks();
+  }
+
+}
+
+/**
+ * Marks a specific flask as 'pouring'. This tilts the flask.
+ *
  * @param {number|null} flaskIndex
  */
 function setFlaskOpen(flaskIndex) {
@@ -142,9 +120,9 @@ function initializeFlasks() {
     const flaskDiv = document.createElement("div");
     flaskDiv.classList.add("flask");
     flaskDiv.addEventListener("click", () => {
-      setFlaskOpen(i);
+      selectFlask(i);
     });
-    renderFlask(flaskDiv, gameData[i], i);
+    renderFlask(flaskDiv, gameData[i]);
 
     flasksEl.appendChild(flaskDiv);
   }
