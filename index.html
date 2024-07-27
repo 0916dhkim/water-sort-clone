@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8" />
     <title>Water Sort</title>
-    <meta name="charset" value="utf-8" />
     <link rel="stylesheet" type="text/css" href="./art.css" />
   </head>
   <body>
     <h1>Water Sort</h1>
-    <pre><output id="output"></output></pre>
+    <output id="status" aria-live="polite" class="visually-hidden"></output>
     <div id="flasks">
       <!-- TODO-->
     </div>
-
-    <dialog id="game-over">
-      <h2>You won!!!<h2>
+    <dialog id="game-over" aria-labelledby="game-over-label">
+      <h2 id="game-over-label">You won!!!</h2>
     </dialog>
 
     <script src="./index.js" type="module" async defer></script>
