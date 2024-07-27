@@ -20,7 +20,7 @@ const gameData = [
 ];
 
 const flasksContainer = document.getElementById("flasks");
-const statusContainer = document.getElementById('status');
+const statusContainer = document.getElementById("status");
 
 /**
  *
@@ -37,13 +37,17 @@ function updateStatus(status, fromIndex, toIndex) {
       statusContainer.innerHTML = `Flask ${fromIndex + 1} deselected.`;
       break;
     case "pour":
-      statusContainer.innerHTML = `Poured from Flask ${fromIndex + 1} to Flask ${toIndex + 1}.`;
+      statusContainer.innerHTML = `Poured from Flask ${
+        fromIndex + 1
+      } to Flask ${toIndex + 1}.`;
       break;
     case "failedToPour":
-      statusContainer.innerHTML = `Cannot pour from Flask ${fromIndex + 1} to Flask ${toIndex + 1}, select another flask.`;
+      statusContainer.innerHTML = `Cannot pour from Flask ${
+        fromIndex + 1
+      } to Flask ${toIndex + 1}, select another flask.`;
       break;
     default:
-      statusContainer.innerHTML = 'Select a flask.'
+      statusContainer.innerHTML = "Select a flask.";
   }
 }
 
@@ -90,8 +94,10 @@ function renderFlask(flaskElement, flask) {
 
     const description = document.createElement("span");
 
-    description.classList.add('visually-hidden');
-    description.innerHTML = `Flask ${Number.parseInt(flaskElement.dataset.index) + 1}, ${FLASK_SIZE} parts.`;
+    description.classList.add("visually-hidden");
+    description.innerHTML = `Flask ${
+      Number.parseInt(flaskElement.dataset.index) + 1
+    }, ${FLASK_SIZE} parts.`;
 
     flaskElement.appendChild(description);
   }
@@ -103,7 +109,7 @@ function renderFlask(flaskElement, flask) {
 
     segment.classList.add("segment");
     segment.dataset.color = flask[i];
-    segment.ariaLabel = flask[i] ?? 'No color';
+    segment.ariaLabel = flask[i] ?? "No color";
 
     list.appendChild(segment);
   }
@@ -112,7 +118,9 @@ function renderFlask(flaskElement, flask) {
 }
 
 function updateFlasks() {
-  const flaskElements = /** @type {HTMLElement[]} */ (Array.from(document.querySelectorAll(".flask")));
+  const flaskElements = /** @type {HTMLElement[]} */ (
+    Array.from(document.querySelectorAll(".flask"))
+  );
 
   for (let i = 0; i < gameData.length; i++) {
     renderFlask(flaskElements[i], gameData[i]);
@@ -129,14 +137,14 @@ function setFlaskOpen(flaskElement) {
 
 /**
  * @param {HTMLElement} flaskElement
-*/
+ */
 function setFlaskClosed(flaskElement) {
   flaskElement.setAttribute("aria-pressed", "false");
   updateStatus("deselected", Number.parseInt(flaskElement.dataset.index));
 }
 
 function setAllFlasksClosed() {
-  flasksContainer.querySelectorAll('.flask').forEach((flaskElement) => {
+  flasksContainer.querySelectorAll(".flask").forEach((flaskElement) => {
     flaskElement.setAttribute("aria-pressed", "false");
   });
 }
@@ -145,7 +153,9 @@ function setAllFlasksClosed() {
  * @param {HTMLElement} flaskElement
  */
 function selectFlask(flaskElement) {
-  const fromFlaskElement = /** @type {HTMLElement} */(flasksContainer.querySelector('[aria-pressed="true"]'));
+  const fromFlaskElement = /** @type {HTMLElement} */ (
+    flasksContainer.querySelector('[aria-pressed="true"]')
+  );
 
   if (!fromFlaskElement) {
     // No flask is selected
@@ -183,7 +193,7 @@ function initializeFlasks() {
   }
 
   flasksContainer.addEventListener("click", (evt) => {
-    const target = /** @type {HTMLElement} */(evt.target);
+    const target = /** @type {HTMLElement} */ (evt.target);
 
     if (target.matches(".flask")) {
       selectFlask(target);
