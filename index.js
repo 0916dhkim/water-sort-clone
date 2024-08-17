@@ -1,26 +1,66 @@
 // @ts-check
 
 /**
- * @typedef {'RED' | 'BLUE'} LiquidColor
+ * @typedef {'RED' | 'GREEN' | 'YELLOW' | 'BLUE' | 'ORANGE' | 'PURPLE'} LiquidColor
  */
 
 /**
  * @typedef {LiquidColor[]} Flask
  */
 
-const FLASK_SIZE = 5;
+/**
+ * @typedef {object} Level
+ *
+ * @prop {Flask[]} state
+ * @prop {number} flaskSize
+ */
+let currentLevel = Number.parseInt(localStorage.getItem("currentLevel") ?? "0");
 
 /**
- * @type {Flask[]}
+ * @type {Level[]}
  */
-const gameData = [
-  ["RED", "BLUE", "RED", "BLUE", "RED"],
-  ["BLUE", "RED", "BLUE", "RED", "BLUE"],
-  [],
+const levels = [
+  {
+    state: [
+      ["RED", "BLUE", "RED", "BLUE", "RED"],
+      ["BLUE", "RED", "BLUE", "RED", "BLUE"],
+      [],
+    ],
+    flaskSize: 5,
+  },
+  {
+    state: [
+      ["BLUE", "GREEN"],
+      ["GREEN", "GREEN", "BLUE"],
+      ["BLUE", "GREEN", "BLUE"],
+      [],
+    ],
+    flaskSize: 4,
+  },
 ];
 
-const flasksContainer = document.getElementById("flasks");
+let gameData;
+let flaskSize;
+
+function loadLevel(index) {
+  gameData = structuredClone(levels[index].state);
+  flaskSize = levels[index].flaskSize;
+  localStorage.setItem("currentLevel", currentLevel.toString());
+}
+
+const levelList = /** @type {HTMLOListElement} */ (
+  document.getElementById("level-list")
+);
+const flasksContainer = /** @type {HTMLDivElement} */ (
+  document.getElementById("flasks")
+);
 const statusContainer = document.getElementById("status");
+const gameOverDialog = /** @type {HTMLDialogElement} */ (
+  document.getElementById("game-over")
+);
+const selectLevelDialog = /** @type {HTMLDialogElement} */ (
+  document.getElementById("level-select")
+);
 
 /**
  *
@@ -69,7 +109,7 @@ function pour(from, to) {
  */
 function canPour(from, to) {
   return (
-    to.length < FLASK_SIZE && (to.length === 0 || isSameColor(from, to.at(-1)))
+    to.length < flaskSize && (to.length === 0 || isSameColor(from, to.at(-1)))
   );
 }
 
@@ -97,14 +137,14 @@ function renderFlask(flaskElement, flask) {
     description.classList.add("visually-hidden");
     description.innerHTML = `Flask ${
       Number.parseInt(flaskElement.dataset.index) + 1
-    }, ${FLASK_SIZE} parts.`;
+    }, ${flaskSize} parts.`;
 
     flaskElement.appendChild(description);
   }
 
   list.replaceChildren();
 
-  for (let i = FLASK_SIZE - 1; i >= 0; i--) {
+  for (let i = flaskSize - 1; i >= 0; i--) {
     const segment = document.createElement("li");
 
     segment.classList.add("segment");
@@ -178,9 +218,25 @@ function selectFlask(flaskElement) {
     setAllFlasksClosed();
     updateFlasks();
   }
+
+  if (isGameOver()) {
+    console.log("GAME IS OVER");
+
+    gameOverDialog.showModal();
+  }
 }
 
+flasksContainer.addEventListener("click", (evt) => {
+  const target = /** @type {HTMLElement} */ (evt.target);
+
+  if (target.matches(".flask")) {
+    selectFlask(target);
+  }
+});
+
 function initializeFlasks() {
+  flasksContainer.innerHTML = "";
+
   for (let i = 0; i < gameData.length; i++) {
     const flaskElement = document.createElement("button");
     flaskElement.classList.add("flask");
@@ -192,27 +248,76 @@ function initializeFlasks() {
     flasksContainer.appendChild(flaskElement);
   }
 
-  flasksContainer.addEventListener("click", (evt) => {
-    const target = /** @type {HTMLElement} */ (evt.target);
-
-    if (target.matches(".flask")) {
-      selectFlask(target);
-    }
-  });
-
   updateStatus("reset");
 }
 
+populateLevelList();
+loadLevel(currentLevel);
 initializeFlasks();
 
 function isGameOver() {
-  for (const flask of gameData) {
+  const flaskColors = [];
+
+  for (const [index, flask] of gameData.entries()) {
     const firstColor = flask[0];
+
+    if (flask.length !== 0 && flask.length !== flaskSize) {
+      return false;
+    }
     for (const color of flask) {
       if (color !== firstColor) {
         return false;
       }
+
+      flaskColors[index] = firstColor;
     }
   }
+
+  for (const [colorIndex, color] of flaskColors.entries()) {
+    const testIndex = flaskColors.findIndex((testColor) => testColor === color);
+
+    if (colorIndex !== testIndex) {
+      return false;
+    }
+  }
+
   return true;
 }
+
+levelList.addEventListener("click", (evt) => {
+  const target = /** @type {HTMLButtonElement} */ (evt.target);
+  const newLevel = Number.parseInt(target.dataset.level);
+
+  loadLevel(newLevel);
+  initializeFlasks();
+  selectLevelDialog.close();
+});
+
+function populateLevelList() {
+  for (const [index] of levels.entries()) {
+    const li = document.createElement("li");
+    const button = document.createElement("button");
+    button.innerHTML = `Level ${index}`;
+    button.dataset.level = index.toString();
+    li.appendChild(button);
+    levelList.appendChild(li);
+  }
+}
+
+document.getElementById("next-level-button")?.addEventListener("click", () => {
+  if (levels.length - 1 === currentLevel) {
+    // do nothing.
+    return;
+  }
+  currentLevel += 1;
+  loadLevel(currentLevel);
+  initializeFlasks();
+  gameOverDialog.close();
+});
+
+document
+  .getElementById("select-level-button")
+  ?.addEventListener("click", () => {
+    gameOverDialog.close();
+    selectLevelDialog.showModal();
+  });
